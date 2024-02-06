@@ -1,6 +1,21 @@
 use std::io::{BufRead, Seek, SeekFrom};
 
+use std::fs::File;
+use std::io::{BufReader, Result};
+
+struct IOUtil {
+    input_handle: Option<BufReader<File>>, // Using BufReader for buffered reading
+    input_file: String,
+}
+
 impl IOUtil {
+
+    fn open_input(&mut self) -> Result<()> {
+        let file = File::open(&self.input_file)?;
+        self.input_handle = Some(BufReader::new(file));
+        Ok(())
+    }
+
     fn parse_spectrum(&mut self, location: u64) -> (f64, f64, String, String, Vec<f64>, Vec<f64>) {
         self.input_handle.seek(SeekFrom::Start(location)).unwrap();
         let mut line = String::new();
