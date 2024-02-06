@@ -37,6 +37,7 @@ impl IOUtil {
             let parts: Vec<&str> = line.split_whitespace().collect();
             let mz = parts[0].parse::<f64>().unwrap();
             let intensity = parts[1].parse::<f64>().unwrap();
+            // TODO: MZ_MAX needs to be used!
             if mz <= self.MZ_MAX {
                 mz_list.push(mz);
                 intensity_list.push(intensity);
