@@ -1,17 +1,17 @@
 use std::io::{BufRead, Seek, SeekFrom};
 
 impl IOUtil {
-    fn _parse_spectrum(&mut self, location: u64) -> (f64, f64, String, String, Vec<f64>, Vec<f64>) {
+    fn parse_spectrum(&mut self, location: u64) -> (f64, f64, String, String, Vec<f64>, Vec<f64>) {
         self.input_handle.seek(SeekFrom::Start(location)).unwrap();
         let mut line = String::new();
         self.input_handle.read_line(&mut line).unwrap();
         assert!(line.contains("BEGIN IONS"), "Error: wrong input BEGIN IONS");
-        let (precursor_mz, charge, scan, raw_sequence) = self._parse_spectrum_header();
-        let (mz_list, intensity_list) = self._parse_spectrum_ion();
+        let (precursor_mz, charge, scan, raw_sequence) = self.parse_spectrum_header();
+        let (mz_list, intensity_list) = self.parse_spectrum_ions();
         (precursor_mz, charge, scan, raw_sequence, mz_list, intensity_list)
     }
 
-    fn _parse_spectrum_header(&mut self) -> (f64, f64, String, String) {
+    fn parse_spectrum_header(&mut self) -> (f64, f64, String, String) {
         let mut line = String::new();
         self.input_handle.read_line(&mut line).unwrap();
         assert!(line.contains("TITLE="), "Error: wrong input TITLE");
@@ -25,7 +25,7 @@ impl IOUtil {
         (precursor_mz, charge, scan, raw_sequence)
     }
 
-    fn _parse_spectrum_ion(&mut self) -> (Vec<f64>, Vec<f64>) {
+    fn parse_spectrum_ions(&mut self) -> (Vec<f64>, Vec<f64>) {
         let mut mz_list = Vec::new();
         let mut intensity_list = Vec::new();
         let mut line = String::new();
