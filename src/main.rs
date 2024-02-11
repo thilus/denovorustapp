@@ -1,34 +1,46 @@
-use std::collections::HashMap;
+mod spectrum;
+use spectrum::Spectrum;
+
 use std::fs::File;
 use std::io::{BufRead, BufReader};
+
 
 fn read_mgf_file(file_input: &str) {
     
     if let Ok(file) = File::open(file_input) {
         let reader = BufReader::new(file);
 
-        let mut current_section = String::new();
-        let mut header_lines = String::new();
-        let mut current_section_data = String::new();
+        let mut spectra: Vec<Spectrum> = Vec::new();
 
         for line in reader.lines() {
+            let mut current_spectrum = Spectrum::new();
             if let Ok(line) = line {
                 if line.starts_with("BEGIN IONS") {
-                    // Start a new section
-                    current_section = line;
-                    header_lines.clear();
-                    current_section_data.clear();
+                    // Initialize a new spectrum                    
                 } else if line.starts_with("END IONS") {
-                    // Process the section
-                    process_section(&current_section, &header_lines, &current_section_data);
+                    // Push the current spectrum to the vector
+                    spectra.push(current_spectrum);
                 } else if line.contains('=') {
-                    // Accumulate header lines
-                    header_lines.push_str(&line);
-                    header_lines.push('\n');
+                    // Parse header information
+                    if line.starts_with("TITLE") {
+                        current_spectrum.title = line.split('=').nth(1).unwrap_or("").trim().to_string();
+                    } else if line.starts_with("CHARGE") {
+                        current_spectrum.charge = line.split('=').nth(1).unwrap_or("").trim().to_string();
+                    } else if line.starts_with("PEPMASS") {
+                        current_spectrum.pepmass = line.split('=').nth(1).unwrap_or("").trim().to_string();
+                    } else if line.starts_with("RTINSECONDS") {
+                        current_spectrum.rtinseconds = line.split('=').nth(1).unwrap_or("").trim().to_string();
+                    } else if line.starts_with("SCANS") {
+                        current_spectrum.scan_number = line.split('=').nth(1).unwrap_or("0").trim().parse().unwrap_or(0);
+                    } else if line.starts_with("PEPTIDE") {
+                        current_spectrum.peptide = line.split('=').nth(1).unwrap_or("").trim().to_string();
+                    } 
                 } else {
-                    // Accumulate data for the current section
-                    current_section_data.push_str(&line);
-                    current_section_data.push('\n');
+                    // Parse mz and intensity values and directly insert them into current_spectrum
+                    if let Some((mz_list, intensity_list)) = parse_mz_intensities(&line) {
+                        current_spectrum.mz_list.extend(mz_list);
+                        current_spectrum.intensity_list.extend(intensity_list);
+                    }
                 }
             }
         }
@@ -37,39 +49,29 @@ fn read_mgf_file(file_input: &str) {
     }
 }
 
-fn process_section(header: &str, header_lines: &str, data: &str) {
-    println!("{}", header);
-
-    // Parse lines in the header
-    let mut header_info: HashMap<&str, &str> = HashMap::new();
-    for line in header_lines.lines() {
-        if let Some(index) = line.find('=') {
-            let (key, value) = line.split_at(index);
-            header_info.insert(key.trim(), value.trim_start_matches('='));
-        }
-    }
-
-    // Print parsed header information
-    for (key, value) in &header_info {
-        println!("{}: {}", key, value);
-    }
-
+fn parse_mz_intensities(data: &str) -> Option<(Vec<f64>, Vec<f64>)> {
     let mut mz_list: Vec<f64> = Vec::new();
     let mut intensity_list: Vec<f64> = Vec::new();
-    //let mut data_line: String = String::new();
     for data_line in data.lines() {
-        let parts: Vec<&str> = data_line.split_whitespace().collect();    
-        let mz = parts[0].parse::<f64>().unwrap();
-        let intensity = parts[1].parse::<f64>().unwrap();
-        println!("m/z: {}, int: {}", mz, intensity);
-        mz_list.push(mz);
-        intensity_list.push(intensity);
+        let parts: Vec<&str> = data_line.split_whitespace().collect();
+        if let Some(mz_str) = parts.get(0) {
+            if let Some(intensity_str) = parts.get(1) {
+                if let Ok(mz) = mz_str.parse::<f64>() {
+                    if let Ok(intensity) = intensity_str.parse::<f64>() {
+                        mz_list.push(mz);
+                        intensity_list.push(intensity);
+                        println!("m/z: {}, int: {}", mz, intensity);
+                    }
+                }
+            }
+        }
     }
-        
+    if !mz_list.is_empty() && !intensity_list.is_empty() {
+        Some((mz_list, intensity_list))
+    } else {
+        None
+    }
 }
-
-
-
 
 fn main() {
     let infile = "test.mgf";
