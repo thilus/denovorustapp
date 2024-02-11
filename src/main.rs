@@ -1,8 +1,10 @@
 mod spectrum;
 use spectrum::Spectrum;
 
+mod mass;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
+
 
 
 fn read_mgf_file(file_input: &str) {
@@ -76,6 +78,13 @@ fn parse_mz_intensities(data: &str) -> Option<(Vec<f64>, Vec<f64>)> {
 fn main() {
     let infile = "test.mgf";
     read_mgf_file(infile);
+   
+    // Example usage of the mass calculation:
+    let sequence = "PEPTIDE";
+    let mass = mass::MassCalculator::calc_monoisotopic_mass(sequence, None, None, None);
+    println!("Mass of sequence {}: {}", sequence, mass);
+
+    
 }
 
 
