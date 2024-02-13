@@ -8,3 +8,6 @@ edition = "2021"
 [dependencies]
 lazy_static = "1.4.0"
 
+[lib]
+name = "testlib"  # Specify the name of your library crate
+path = "src/peak.rs"  # Path to your library source file
