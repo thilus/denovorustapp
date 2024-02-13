@@ -4,14 +4,24 @@ use spectrum::Spectrum;
 mod mass;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
-
+use std::fs;
 
 
 fn read_mgf_file(file_input: &str) {
-    
+    // Attempt to get the full path
+    match fs::canonicalize(file_input) {
+        Ok(full_path) => {
+            // Full path retrieved successfully
+            println!("Full path of the file: {}", full_path.to_string_lossy());
+        }
+        Err(e) => {
+            // Error occurred while retrieving the full path
+            eprintln!("Error getting full path: {}", e);
+        }
+    }
     if let Ok(file) = File::open(file_input) {
         let reader = BufReader::new(file);
-
+        
         let mut spectra: Vec<Spectrum> = Vec::new();
 
         for line in reader.lines() {
