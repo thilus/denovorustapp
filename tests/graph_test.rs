@@ -1,9 +1,8 @@
-/*Import the structs and functions from the original source file
-
+/*
 #[cfg(test)]
 mod tests {
-
-    use denovorust_app::graph::{Graph};
+    mod graph;
+    use graph::{Graph};
     use denovorust_app::spectrum::{Spectrum};
 
     #[test]
