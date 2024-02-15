@@ -58,4 +58,19 @@ impl Spectrum {
     } */
 }
 
+impl Clone for Spectrum {
+    fn clone(&self) -> Self {
+        Spectrum {
+            title: self.title.clone(),
+            charge: self.charge,
+            pepmass: self.pepmass.clone(),
+            rtinseconds: self.rtinseconds.clone(),
+            scan_number: self.scan_number,
+            peptide: self.peptide.clone(),
+            mz_vec: self.mz_vec.clone(),
+            intensity_vec: self.intensity_vec.clone(),
+        }
+    }
+}
+
 

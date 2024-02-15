@@ -1,14 +1,14 @@
 #[derive(Debug, PartialEq)]
-struct Peak {
-    mz: f32,
-    intensity: f32,
-    charge: i32,
-    index: i32,
-    rank: i32,
+pub struct Node {
+    pub(crate) mz: f32,
+    pub(crate) intensity: f32,
+    pub(crate) charge: i32,
+    pub(crate) index: i32,
+    pub(crate) rank: i32,
 }
 
-impl Peak {
-    fn new(mz: f32, intensity: f32, charge: i32) -> Self {
+impl Node {
+    pub fn new(mz: f32, intensity: f32, charge: i32) -> Self {
         Self {
             mz,
             intensity,
@@ -18,7 +18,7 @@ impl Peak {
         }
     }
 
-    fn clone(&self) -> Self {
+    pub fn clone(&self) -> Self {
         Self {
             mz: self.mz,
             intensity: self.intensity,
@@ -28,7 +28,7 @@ impl Peak {
         }
     }
 
-    fn compare_to(&self, other: &Self) -> std::cmp::Ordering {
+    pub fn compare_to(&self, other: &Self) -> std::cmp::Ordering {
         match self.mz.partial_cmp(&other.mz).unwrap_or(std::cmp::Ordering::Equal) {
             std::cmp::Ordering::Equal => self.intensity.partial_cmp(&other.intensity).unwrap_or(std::cmp::Ordering::Equal),
             ordering => ordering,
@@ -44,13 +44,13 @@ impl Peak {
         (self.mz - other.mz).abs() < std::f32::EPSILON && (self.intensity - other.intensity).abs() < std::f32::EPSILON
     }
 
-    fn get_mass(&self) -> f32 {
-        (self.mz - crate::Composition::PROTON) * self.charge as f32
-    }
+    /*fn get_mass(&self) -> f32 {
+        (self.mz - crate::composition::Composition) * self.charge as f32
+    }*/
 
-    fn get_complement_mass(&self, parent_mass: f32) -> f32 {
+    /*fn get_complement_mass(&self, parent_mass: f32) -> f32 {
         parent_mass - self.get_mass()
-    }
+    }*/
 
     fn to_string(&self) -> String {
         format!("{} {}", self.mz, self.intensity)

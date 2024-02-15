@@ -1,12 +1,15 @@
 mod spectrum;
 use spectrum::Spectrum;
-
+mod graph;
+mod node;
+mod composition;
+use graph::Graph;
 mod mass;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::fs;
 
-fn read_mgf_file(file_input: &str) {
+fn read_mgf_file_and_return_spectra(file_input: &str) -> Vec<Spectrum> {
     // Attempt to get the full path
     match fs::canonicalize(file_input) {
         Ok(full_path) => {
@@ -18,26 +21,27 @@ fn read_mgf_file(file_input: &str) {
             eprintln!("Error getting full path: {}", e);
         }
     }
+
+    let mut spectra: Vec<Spectrum> = Vec::new();
+
     if let Ok(file) = File::open(file_input) {
         let reader = BufReader::new(file);
-        
-        let mut spectra: Vec<Spectrum> = Vec::new();
+
+        let mut current_spectrum = Spectrum::new();
 
         for line in reader.lines() {
-            let mut current_spectrum = Spectrum::new();
             if let Ok(line) = line {
                 if line.starts_with("BEGIN IONS") {
-                    // Initialize a new spectrum                    
+                    current_spectrum = Spectrum::new(); // Initialize a new spectrum
                 } else if line.starts_with("END IONS") {
                     // Push the current spectrum to the vector
-                    spectra.push(current_spectrum);
+                    spectra.push(current_spectrum.clone()); // Clone the spectrum to avoid moving
                 } else if line.contains('=') {
                     // Parse header information
                     if line.starts_with("TITLE") {
                         current_spectrum.title = line.split('=').nth(1).unwrap_or("").trim().to_string();
                     } else if line.starts_with("CHARGE") {
                         current_spectrum.charge = line.split('=').nth(1).and_then(|s| s.trim().parse().ok()).unwrap_or(0); // Default value if parsing fails
-           
                     } else if line.starts_with("PEPMASS") {
                         current_spectrum.pepmass = line.split('=').nth(1).unwrap_or("").trim().to_string();
                     } else if line.starts_with("RTINSECONDS") {
@@ -46,7 +50,7 @@ fn read_mgf_file(file_input: &str) {
                         current_spectrum.scan_number = line.split('=').nth(1).unwrap_or("0").trim().parse().unwrap_or(0);
                     } else if line.starts_with("PEPTIDE") {
                         current_spectrum.peptide = line.split('=').nth(1).unwrap_or("").trim().to_string();
-                    } 
+                    }
                 } else {
                     // Parse mz and intensity values and directly insert them into current_spectrum
                     if let Some((mz_list, intensity_list)) = parse_mz_intensities(&line) {
@@ -59,6 +63,8 @@ fn read_mgf_file(file_input: &str) {
     } else {
         println!("Failed to open the file {}", file_input);
     }
+
+    spectra
 }
 
 fn parse_mz_intensities(data: &str) -> Option<(Vec<f32>, Vec<f32>)> {
@@ -87,12 +93,16 @@ fn parse_mz_intensities(data: &str) -> Option<(Vec<f32>, Vec<f32>)> {
 
 fn main() {
     let infile = "test.mgf";
-    read_mgf_file(infile);
-   
+    let spectra = read_mgf_file_and_return_spectra(infile);
+
     // Example usage of the mass calculation:
     let sequence = "PEPTIDE";
     let mass = mass::MassCalculator::calc_monoisotopic_mass(sequence, None, None, None);
-    println!("Mass of sequence {}: {}", sequence, mass);    
+    println!("Mass of sequence {}: {}", sequence, mass);
+
+    // Print the spectra
+    for spectrum in &spectra {
+        let graph = Graph::generate_graph_from_spectrum(&spectrum); 
+        println!("no. nodes: {}", graph.all_nodes.len());       
+    }
 }
-
-
