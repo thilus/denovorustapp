@@ -1,7 +1,40 @@
-struct Graph {
+pub struct Graph {
+    pub all_nodes: Vec<Vertex>,
+    pub filtered_nodes: Vec<Vertex>,
+}
+
+impl Graph {
+    // Assume implementation of methods for Graph
+    pub fn generate_graph_from_spectrum(spectrum: &Spectrum) -> Self {
+        let peaks = spectrum.generate_peak_vector(); // Assuming exp_spectrum and get_peaks() method exist
+        
+        let mut all_nodes = vec![];
+        let mut filtered_nodes = vec![];
+
+        // Add the starting node to the graph.
+        all_nodes.push(Node { mz: 0.0, intensity: 0.0 });
+
+        // Add the spectrum peaks as nodes to the graph.
+        for peak in peaks.iter() {
+            let node = Vertex {
+                mz: peak.mz,
+                intensity: peak.intensity,
+            };
+            all_nodes.push(node.clone()); // Add to all_nodes
+            if some_condition(&node) { // Adjust this condition according to your needs
+                filtered_nodes.push(node); // Add to filtered_nodes
+            }
+        }
+
+        Graph { all_nodes, filtered_nodes }
+    }
+}
+
+// Define Vertex and Spectrum structs as necessary
+
+/*struct Graph {
     aa_set: AASet, // TODO
     charges: Vec<i32>,
-    ptm_edge_allowed: bool,
     all_nodes: Vec<Node>, 
     filtered_nodes: Vec<Node>, 
 }
@@ -55,4 +88,4 @@ impl Graph {
             filtered_nodes,
         }
     }
-}
+}*/

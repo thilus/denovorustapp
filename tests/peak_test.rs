@@ -10,8 +10,6 @@ fn test_peak_new() {
     assert_eq!(peak.mz, 100.0);
     assert_eq!(peak.intensity, 50.0);
     assert_eq!(peak.charge, 2);
-    assert_eq!(peak.index, -1);
-    assert_eq!(peak.rank, -1);
 }
 
 // Add more test functions for other methods as needed
@@ -21,8 +19,6 @@ fn test_peak_creation() {
     assert_eq!(peak.mz, 100.0);
     assert_eq!(peak.intensity, 50.0);
     assert_eq!(peak.charge, 2);
-    assert_eq!(peak.index, -1);
-    assert_eq!(peak.rank, -1);
 }
 
 #[test]

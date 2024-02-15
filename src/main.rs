@@ -6,7 +6,6 @@ use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::fs;
 
-
 fn read_mgf_file(file_input: &str) {
     // Attempt to get the full path
     match fs::canonicalize(file_input) {
@@ -37,7 +36,8 @@ fn read_mgf_file(file_input: &str) {
                     if line.starts_with("TITLE") {
                         current_spectrum.title = line.split('=').nth(1).unwrap_or("").trim().to_string();
                     } else if line.starts_with("CHARGE") {
-                        current_spectrum.charge = line.split('=').nth(1).unwrap_or("").trim().to_string();
+                        current_spectrum.charge = line.split('=').nth(1).and_then(|s| s.trim().parse().ok()).unwrap_or(0); // Default value if parsing fails
+           
                     } else if line.starts_with("PEPMASS") {
                         current_spectrum.pepmass = line.split('=').nth(1).unwrap_or("").trim().to_string();
                     } else if line.starts_with("RTINSECONDS") {
@@ -50,8 +50,8 @@ fn read_mgf_file(file_input: &str) {
                 } else {
                     // Parse mz and intensity values and directly insert them into current_spectrum
                     if let Some((mz_list, intensity_list)) = parse_mz_intensities(&line) {
-                        current_spectrum.mz_list.extend(mz_list);
-                        current_spectrum.intensity_list.extend(intensity_list);
+                        current_spectrum.mz_vec.extend(mz_list);
+                        current_spectrum.intensity_vec.extend(intensity_list);
                     }
                 }
             }
@@ -61,15 +61,15 @@ fn read_mgf_file(file_input: &str) {
     }
 }
 
-fn parse_mz_intensities(data: &str) -> Option<(Vec<f64>, Vec<f64>)> {
-    let mut mz_list: Vec<f64> = Vec::new();
-    let mut intensity_list: Vec<f64> = Vec::new();
+fn parse_mz_intensities(data: &str) -> Option<(Vec<f32>, Vec<f32>)> {
+    let mut mz_list: Vec<f32> = Vec::new();
+    let mut intensity_list: Vec<f32> = Vec::new();
     for data_line in data.lines() {
         let parts: Vec<&str> = data_line.split_whitespace().collect();
         if let Some(mz_str) = parts.get(0) {
             if let Some(intensity_str) = parts.get(1) {
-                if let Ok(mz) = mz_str.parse::<f64>() {
-                    if let Ok(intensity) = intensity_str.parse::<f64>() {
+                if let Ok(mz) = mz_str.parse::<f32>() {
+                    if let Ok(intensity) = intensity_str.parse::<f32>() {
                         mz_list.push(mz);
                         intensity_list.push(intensity);
                         println!("m/z: {}, int: {}", mz, intensity);
@@ -92,9 +92,7 @@ fn main() {
     // Example usage of the mass calculation:
     let sequence = "PEPTIDE";
     let mass = mass::MassCalculator::calc_monoisotopic_mass(sequence, None, None, None);
-    println!("Mass of sequence {}: {}", sequence, mass);
-
-    
+    println!("Mass of sequence {}: {}", sequence, mass);    
 }
 
 

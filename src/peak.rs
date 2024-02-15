@@ -5,18 +5,15 @@ pub struct Peak {
     pub mz: f32,
     pub intensity: f32,
     pub charge: i32,
-    pub index: i32,
-    pub rank: i32,
 }
 
 impl Peak {
+    
     pub fn new(mz: f32, intensity: f32, charge: i32) -> Self {
         Self {
             mz,
             intensity,
             charge,
-            index: -1,
-            rank: -1,
         }
     }
 
@@ -25,8 +22,6 @@ impl Peak {
             mz: self.mz,
             intensity: self.intensity,
             charge: self.charge,
-            index: self.index,
-            rank: self.rank,
         }
     }
 
@@ -65,8 +60,7 @@ impl fmt::Debug for Peak {
             .field("mz", &self.mz)
             .field("intensity", &self.intensity)
             .field("charge", &self.charge)
-            .field("index", &self.index)
-            .field("rank", &self.rank)
+
             .finish()
     }
 }
