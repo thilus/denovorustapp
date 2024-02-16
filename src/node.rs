@@ -29,10 +29,13 @@ impl Node {
             rank: self.rank,
         }
     }
-
     
     pub fn compare_by_mz(a: &Node, b: &Node) -> Ordering {
         a.mz.partial_cmp(&b.mz).unwrap_or(Ordering::Equal)
+    }
+
+    pub fn compare_by_intensity(a: &Node, b: &Node) -> Ordering {
+        a.intensity.partial_cmp(&b.intensity).unwrap_or(Ordering::Equal)
     }
 
     fn duplicate(&self, offset: f32) -> Self {

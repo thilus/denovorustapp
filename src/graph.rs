@@ -28,18 +28,25 @@ impl Graph {
                 index: index_i,
                 rank: 0,
             };
-            all_nodes.push(node.clone()); // Add to all_nodes
+            all_nodes.push(node.clone()); 
+            filtered_nodes.push(node.clone()); 
+            
 
-            // Sort nodes by mz
-            all_nodes.sort_by(Node::compare_by_mz);
-
-            // Print sorted nodes
-            println!("Sorted nodes by m/z: {:?}", all_nodes);
-
+            // TODO: filter the nodes somehow
             /*if some_condition(&node) { // Adjust this condition according to your needs
                 filtered_nodes.push(node); // Add to filtered_nodes
             }*/
         }
+
+        // Sort all nodes by mz
+        all_nodes.sort_by(Node::compare_by_mz);
+
+        // Sort filtered nodes by mz
+        filtered_nodes.sort_by(Node::compare_by_intensity);
+
+        // Print sorted nodes
+        println!("Sorted nodes by m/z: {:?}", all_nodes);
+        println!("Sorted nodes by intensity: {:?}", filtered_nodes);
 
         Graph { all_nodes, filtered_nodes }
     }
