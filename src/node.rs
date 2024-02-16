@@ -1,3 +1,5 @@
+use std::cmp::Ordering;
+
 #[derive(Debug, PartialEq)]
 pub struct Node {
     pub(crate) mz: f32,
@@ -28,11 +30,9 @@ impl Node {
         }
     }
 
-    pub fn compare_to(&self, other: &Self) -> std::cmp::Ordering {
-        match self.mz.partial_cmp(&other.mz).unwrap_or(std::cmp::Ordering::Equal) {
-            std::cmp::Ordering::Equal => self.intensity.partial_cmp(&other.intensity).unwrap_or(std::cmp::Ordering::Equal),
-            ordering => ordering,
-        }
+    
+    pub fn compare_by_mz(a: &Node, b: &Node) -> Ordering {
+        a.mz.partial_cmp(&b.mz).unwrap_or(Ordering::Equal)
     }
 
     fn duplicate(&self, offset: f32) -> Self {

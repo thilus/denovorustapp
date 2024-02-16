@@ -29,6 +29,13 @@ impl Graph {
                 rank: 0,
             };
             all_nodes.push(node.clone()); // Add to all_nodes
+
+            // Sort nodes by mz
+            all_nodes.sort_by(Node::compare_by_mz);
+
+            // Print sorted nodes
+            println!("Sorted nodes by m/z: {:?}", all_nodes);
+
             /*if some_condition(&node) { // Adjust this condition according to your needs
                 filtered_nodes.push(node); // Add to filtered_nodes
             }*/
