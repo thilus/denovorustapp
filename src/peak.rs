@@ -1,14 +1,13 @@
+use std::fmt;
 mod composition;
 use composition::Composition;
-use std::fmt;
 pub struct Peak {
     pub mz: f32,
     pub intensity: f32,
     pub charge: i32,
 }
 
-impl Peak {
-    
+impl Peak {    
     pub fn new(mz: f32, intensity: f32, charge: i32) -> Self {
         Self {
             mz,
@@ -42,7 +41,7 @@ impl Peak {
     }
 
     pub fn get_mass(&self) -> f32 {
-        (self.mz - Composition::default().proton) * self.charge as f32
+        (self.mz - Composition::new("proton").mass as f32 * self.charge as f32)
     }
 
     pub fn get_complement_mass(&self, parent_mass: f32) -> f32 {

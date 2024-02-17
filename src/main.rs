@@ -3,6 +3,8 @@ use spectrum::Spectrum;
 mod graph;
 mod node;
 mod composition;
+use composition::AminoAcidSequence;
+use composition::generate_seqmz_candidates;
 use graph::Graph;
 mod mass;
 use std::fs::File;
@@ -92,6 +94,24 @@ fn parse_mz_intensities(data: &str) -> Option<(Vec<f32>, Vec<f32>)> {
 }
 
 fn main() {
+    // Mass generator test:
+
+    let res_seq = AminoAcidSequence::new();
+    let aalist = res_seq.aa_residual_composition.keys().collect::<Vec<_>>();
+    // Iterate over the vector and print out the values
+    for item in &aalist {
+        let mass = res_seq.aa_residual_composition[&aalist[0]].mass();
+        println!("AA {:?} {}", item, mass);
+        
+    }
+
+    let max_mass = 200.0;
+    let aalist_startindex = 0;
+    //let result = generate_seqmz_candidates(&res_seq, max_mass, aalist_startindex);
+
+    // Print the result
+    //println!("Result: {:?}", result);
+
     let infile = "test.mgf";
     let spectra = read_mgf_file_and_return_spectra(infile);
 
