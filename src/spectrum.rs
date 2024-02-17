@@ -1,5 +1,4 @@
 use std::vec::Vec;
-
 use testlib::Peak;
 
 pub struct Spectrum {
