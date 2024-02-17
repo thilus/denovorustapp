@@ -1,4 +1,4 @@
-# Rust Implementation of a De Novo Peptide Sequencing Graph Algorithm
+# De Novo Peptide Sequencing Graph Algorithm (coded in Rust)
 
 A brief overview of the algorithm:
 1) Extract peaks from mass spectra
