@@ -97,8 +97,12 @@ fn main() {
 
     let res_seq = AminoAcidSequence::new();
     let aalist = res_seq.aa_residual_composition.keys().collect::<Vec<_>>();
+    let values = res_seq.aa_residual_composition.values();
+
     // Iterate over the vector and print out the values
     let mut index = 0;
+
+    // TODO: check this why it does not work anymore?!
     for item in &aalist {
         let mass = res_seq.aa_residual_composition[&aalist[index]].mass();
         println!("AA {:?} {}", item, mass);

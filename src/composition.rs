@@ -100,8 +100,8 @@ pub struct AminoAcidSequence {
 
 impl AminoAcidSequence {
     pub fn new() -> AminoAcidSequence {
-        let aa_residual_composition = HashMap::new();
-        let _compositions = vec![
+        let mut aa_residual_composition = HashMap::new();
+        let compositions = vec![
             ("A", "C3H7O2N1"),
             ("R", "C6H14N4O2"),
             ("N", "C4H8O3N2"),
@@ -123,6 +123,10 @@ impl AminoAcidSequence {
             ("Y", "C9H11O3N1"),
             ("V", "C5H11O2N1"),
         ];
+
+        for (key, value) in compositions {
+            aa_residual_composition.insert(key.chars().next().unwrap(), Composition::new(value)); 
+        }
 
         AminoAcidSequence {
             aa_residual_composition,
