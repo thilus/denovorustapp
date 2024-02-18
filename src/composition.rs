@@ -124,11 +124,6 @@ impl AminoAcidSequence {
             ("V", "C5H11O2N1"),
         ];
 
-        for (key, value) in compositions {
-            aa_residual_composition.insert(key.chars().next().unwrap(), Composition::new(value));
-            println!("value: {}", value);
-        }
-
         AminoAcidSequence {
             aa_residual_composition,
         }
