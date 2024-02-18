@@ -109,12 +109,12 @@ fn main() {
         index += 1;
     }
 
-    let max_mass = 200.0;
+    let max_mass = 1000.0;
     let aalist_startindex = 0;
-    //TODO: let result = generate_seqmz_candidates(&res_seq, max_mass, aalist_startindex);
+    let result = generate_seqmz_candidates(&res_seq, max_mass, aalist_startindex);
 
     // Print the result
-    //println!("Result: {:?}", result);
+    println!("Result: {:?}", result);
 
     let infile = "test.mgf";
     let spectra = read_mgf_file_and_return_spectra(infile);

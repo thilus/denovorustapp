@@ -135,36 +135,37 @@ impl AminoAcidSequence {
 
 
 }
-
 pub fn generate_seqmz_candidates(res_seq: &AminoAcidSequence, max_mass: f64, aalist_startindex: usize) -> Vec<f64> {
     let mut result = Vec::new();
     let aalist = res_seq.aa_residual_composition.keys().collect::<Vec<_>>();
-    // Iterate over the vector and print out the values
-    for item in &aalist {
-        println!("{:?}", item);
-    }
-    let mut i = 0;
-
+    
+    let mut i = aalist_startindex;
+    println!("test");
     if aalist.len() - 1 == aalist_startindex {
         loop {
-            let mass = if i == 0 { 0.0 } else { res_seq.aa_residual_composition[&aalist[aalist_startindex]].mass() };
-            let mass_remain = max_mass - mass;
+            println!("calc: mass {}", res_seq.aa_residual_composition[&aalist[i]].mass());
+            // TODO: multiple the chars by index i! account for this in the aminoacidseq
+            let mass = if i < aalist.len() { res_seq.aa_residual_composition[&aalist[i]].mass() } else { 0.0 };
+            let mass_remain = 1000.0 - mass;
+            println!("mass remain: {}", mass_remain);
             if mass_remain < 0.0 {
                 break;
             } 
-            print!("mass: {}", mass);
+            println!("mass: {}", mass);
             result.push(mass);
             i += 1;
         }
     } else {
+        i = 0;
         loop {
-            let mass = if i == 0 { 0.0 } else { res_seq.aa_residual_composition[&aalist[aalist_startindex]].mass() };
-            let mass_remain = max_mass - mass;
+            let mass = if i < aalist.len() { res_seq.aa_residual_composition[&aalist[aalist_startindex]].mass() } else { 0.0 };
+            let mass_remain = 1000.0 - mass;
             if mass_remain < 0.0 {
                 break;
             }
             for r in generate_seqmz_candidates(res_seq, mass_remain, aalist_startindex + 1) {
                 result.push(mass + r);
+                println!("mass + r: {}", mass + r);
             }
             i += 1;
         }
