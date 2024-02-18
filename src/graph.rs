@@ -18,7 +18,7 @@ impl Graph {
         all_nodes.push(Node { mz: 0.0, intensity: 0.0, charge: 2, index: 0, rank: 0 });
 
         // Add the spectrum peaks as nodes to the graph.
-        let mut index_i: i32 = 0;
+        let index_i: i32 = 0;
         for peak in peaks.iter() {
 
             let node = Node {

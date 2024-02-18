@@ -6,7 +6,6 @@ mod composition;
 use composition::AminoAcidSequence;
 use composition::generate_seqmz_candidates;
 use graph::Graph;
-mod mass;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::fs;
@@ -108,7 +107,7 @@ fn main() {
 
     let max_mass = 200.0;
     let aalist_startindex = 0;
-    //let result = generate_seqmz_candidates(&res_seq, max_mass, aalist_startindex);
+    //TODO: let result = generate_seqmz_candidates(&res_seq, max_mass, aalist_startindex);
 
     // Print the result
     //println!("Result: {:?}", result);
@@ -118,8 +117,8 @@ fn main() {
 
     // Example usage of the mass calculation:
     let sequence = "PEPTIDE";
-    let mass = mass::MassCalculator::calc_monoisotopic_mass(sequence, None, None, None);
-    println!("Mass of sequence {}: {}", sequence, mass);
+    //TODO: replace this - let mass = mass::MassCalculator::calc_monoisotopic_mass(sequence, None, None, None);
+    //println!("Mass of sequence {}: {}", sequence, mass);
 
     // Print the spectra
     for spectrum in &spectra {
