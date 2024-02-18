@@ -10,25 +10,34 @@ pub struct Composition {
 
 impl Composition {
     pub fn new(class_input: &str) -> Self {
-        let mut composition = HashMap::new();
+        let mut composition = HashMap::with_capacity(class_input.len());
         let mut atom_mass = HashMap::new();
         atom_mass.insert('H', 1.00782503223);
+        atom_mass.insert('X', 1.007276466621);        
         atom_mass.insert('C', 12.0);
         atom_mass.insert('N', 14.00307400443);
         atom_mass.insert('O', 15.99491461957);
         atom_mass.insert('P', 30.97376199842);
         atom_mass.insert('S', 31.9720711744);
 
-        if class_input.chars().all(|c| c.is_uppercase()) {
-            let iter = if class_input.starts_with('-') {
-                class_input[1..].chars()
-            } else {
-                class_input.chars()
-            };
-            composition = iter.filter(|c| c.is_alphabetic())
-                .map(|c| (c, class_input.matches(c).count() as i32))
-                .collect();
-        } else {
+        if class_input.chars().all(|c: char| c.is_uppercase() || c.is_numeric()) {            
+            let mut iter = class_input.chars().peekable();
+            let mut current_atom = iter.next().unwrap();
+            let mut count_str = String::new();            
+            while let Some(c) = iter.next() {               
+                if c.is_numeric() {
+                    count_str.push(c);           
+                } else {
+                    if !count_str.is_empty() {
+                        let count = count_str.parse().unwrap_or(1);                        
+                        composition.insert(current_atom, count);
+                        current_atom = c;
+                        count_str.clear();
+                    }                   
+                }
+            }        
+            composition.insert(current_atom, count_str.parse().unwrap_or(1));
+        } else {            
             composition.insert(class_input.chars().next().unwrap(), 1);
         }
 
@@ -93,30 +102,31 @@ impl AminoAcidSequence {
     pub fn new() -> AminoAcidSequence {
         let mut aa_residual_composition = HashMap::new();
         let compositions = vec![
-            ("A", "C3H5ON"),
-            ("R", "C6H12ON4"),
-            ("N", "C4H6O2N2"),
-            ("D", "C4H5O3N"),
-            ("M", "C3H5ONS-H+C2H4ON"),
-            ("E", "C5H7O3N"),
-            ("Q", "C5H8O2N2"),
-            ("G", "C2H3ON"),
-            ("H", "C6H7ON3"),
-            ("I", "C6H11ON"),
-            ("K", "C6H12ON2"),
-            ("M", "C5H9ONS"),
-            ("M", "C5H9ONS+O"),
-            ("F", "C9H9ON"),
-            ("P", "C5H7ON"),
-            ("S", "C3H5O2N"),
-            ("T", "C4H7O2N"),
-            ("W", "C11H10ON2"),
-            ("Y", "C9H9O2N"),
-            ("V", "C5H9ON"),
+            ("A", "C3H7O2N1"),
+            ("R", "C6H14N4O2"),
+            ("N", "C4H8O3N2"),
+            ("D", "C4H7O4N1"),
+            ("C", "C3H7O2N1S1"),
+            ("E", "C5H9O4N1"),
+            ("Q", "C5H10O3N2"),
+            ("G", "C2H5O2N1"),
+            ("H", "C6H9O2N3"),
+            ("I", "C6H13O2N1"),
+            ("K", "C6H14O2N2"),
+            ("L", "C6H13O2N1"),
+            ("M", "C5H11O2N1S1"),
+            ("F", "C9H11O2N1"),
+            ("P", "C5H9O2N1"),
+            ("S", "C3H7O3N1"),
+            ("T", "C4H9O3N1"),
+            ("W", "C11H12O2N2"),
+            ("Y", "C9H11O3N1"),
+            ("V", "C5H11O2N1"),
         ];
 
         for (key, value) in compositions {
             aa_residual_composition.insert(key.chars().next().unwrap(), Composition::new(value));
+            println!("value: {}", value);
         }
 
         AminoAcidSequence {
@@ -162,4 +172,46 @@ pub fn generate_seqmz_candidates(res_seq: &AminoAcidSequence, max_mass: f64, aal
     }
 
     result
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_new_with_uppercase_input() {
+        // Test creating a Composition with uppercase input
+        let class_input = "C6H14N4O2"; // Example input
+        let composition = Composition::new(class_input);
+        // Iterate over the keys and values
+        for (key, value) in &composition.composition {
+            println!("Atom: {} | Count: {}", key, value);
+        }
+
+        // Verify that the composition contains the expected atoms and counts
+        let mut expected_composition = HashMap::new();
+        expected_composition.insert('C', 6);
+        expected_composition.insert('H', 14);
+        expected_composition.insert('O', 2);
+        expected_composition.insert('N', 4);
+        assert_eq!(composition.composition, expected_composition);
+
+        // Verify the calculated mass (you can adjust the expected value based on your actual data)
+        assert_eq!(composition.mass(), 174.11167570807999, "Unexpected mass for C6H14N4O2");
+    }
+
+    #[test]
+    fn test_new_with_single_atom() {
+        // Test creating a Composition with a single atom
+        let class_input = "C"; // Example input
+        let composition = Composition::new(class_input);
+
+        // Verify that the composition contains only the specified atom
+        let expected_composition: HashMap<char, i32> = [('C', 1)].iter().cloned().collect();
+        assert_eq!(composition.composition, expected_composition);
+
+        // Verify the calculated mass (you can adjust the expected value based on your actual data)
+        assert_eq!(composition.mass(), 12.0, "Unexpected mass for C");
+    }
+        
 }

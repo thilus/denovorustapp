@@ -41,10 +41,12 @@ impl Peak {
     }
 
     pub fn get_mass(&self) -> f32 {
-        (self.mz - Composition::new("proton").mass as f32 * self.charge as f32)
+        self.mz - Composition::new("X").mass as f32 * self.charge as f32
     }
 
     pub fn get_complement_mass(&self, parent_mass: f32) -> f32 {
+        println!("parent mass: {}", parent_mass);
+        println!("self mass: {}", self.get_mass());
         parent_mass - self.get_mass()
     }
 

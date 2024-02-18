@@ -37,6 +37,7 @@ fn test_peak_comparison() {
 #[test]
 fn test_peak_complement_mass_calculation() {
     let peak = Peak::new(100.0, 50.0, 2);
+    println!("peak compl mass: {}", peak.get_complement_mass(1000.0));
     assert_eq!(peak.get_complement_mass(1000.0), 1000.0 - peak.get_mass());
 }
 
