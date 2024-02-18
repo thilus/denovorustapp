@@ -1,4 +1,6 @@
 use std::collections::HashMap;
+use std::collections::HashSet;
+use std::hash::{Hash, Hasher};
 use std::fmt;
 
 #[derive(Clone, Debug)]
@@ -174,6 +176,71 @@ pub fn generate_seqmz_candidates(res_seq: &AminoAcidSequence, max_mass: f64, aal
     result
 }
 
+// Newtype wrapper around f64 implementing Eq and Hash
+#[derive(Debug, Copy, Clone)]
+pub struct Float(f64);
+
+impl Eq for Float {}
+
+impl PartialEq for Float {
+    fn eq(&self, other: &Self) -> bool {
+        self.0 == other.0 || (self.0 - other.0).abs() < f64::EPSILON
+    }
+}
+
+impl Hash for Float {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        // Hash the bits representation of the float
+        state.write_u64(self.0.to_bits());
+    }
+}
+
+impl fmt::Display for Float {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
+
+// Define a struct to represent an amino acid with its mass
+#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
+pub struct AminoAcid {
+    pub symbol: &'static str,
+    pub mass: Float, // Use the Float wrapper type
+}
+
+impl AminoAcid {
+    pub fn new(symbol: &'static str, mass: f64) -> Self {
+        AminoAcid { symbol, mass: Float(mass) } // Wrap the mass in Float
+    }
+}
+
+// Function to generate all possible masses from a set of amino acids
+pub fn generate_masses(amino_acids: &[AminoAcid], max_mass: f64) -> HashSet<Float> {
+    let mut masses = HashSet::new();
+    generate_masses_recursive(amino_acids, &mut masses, max_mass, 0.0);
+    masses
+}
+
+// Recursive function to generate masses
+fn generate_masses_recursive(
+    amino_acids: &[AminoAcid],
+    masses: &mut HashSet<Float>,
+    max_mass: f64,
+    current_mass: f64,
+) {
+    println!("mass: {}, max_mass: {}", current_mass, max_mass);
+    if current_mass < max_mass {
+        println!("mass: {}", current_mass);
+        masses.insert(Float(current_mass));
+        for amino_acid in amino_acids {
+            let new_mass = current_mass + amino_acid.mass.0; // Unwrap the Float
+            println!("Adding Amino Acid: {}, New Mass: {:.4}", amino_acid.symbol, new_mass);
+            generate_masses_recursive(amino_acids, masses, max_mass, new_mass);
+        }
+    }    
+}
+
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -213,5 +280,7 @@ mod tests {
         // Verify the calculated mass (you can adjust the expected value based on your actual data)
         assert_eq!(composition.mass(), 12.0, "Unexpected mass for C");
     }
+
+     
         
 }

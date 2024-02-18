@@ -4,6 +4,8 @@ mod graph;
 mod node;
 mod composition;
 use composition::AminoAcidSequence;
+use composition::AminoAcid;
+use composition::generate_masses;
 use composition::generate_seqmz_candidates;
 use graph::Graph;
 use std::fs::File;
@@ -93,8 +95,42 @@ fn parse_mz_intensities(data: &str) -> Option<(Vec<f32>, Vec<f32>)> {
 }
 
 fn main() {
-    // Mass generator test:
+        // Define essential amino acids and their monoisotopic masses
+        let amino_acids = [
+        AminoAcid::new("A", 71.03711),   // Alanine
+        AminoAcid::new("R", 156.10111),  // Arginine
+        AminoAcid::new("N", 114.04293),  // Asparagine
+        AminoAcid::new("D", 115.02694),  // Aspartic acid
+        AminoAcid::new("C", 103.00919),  // Cysteine
+        AminoAcid::new("Q", 128.05858),  // Glutamine
+        AminoAcid::new("E", 129.04259),  // Glutamic acid
+        AminoAcid::new("G", 57.02146),   // Glycine
+        AminoAcid::new("H", 137.05891),  // Histidine
+        AminoAcid::new("I", 113.08406),  // Isoleucine
+        AminoAcid::new("L", 113.08406),  // Leucine
+        AminoAcid::new("K", 128.09496),  // Lysine
+        AminoAcid::new("M", 131.04049),  // Methionine
+        AminoAcid::new("F", 147.06841),  // Phenylalanine
+        AminoAcid::new("P", 97.05276),   // Proline
+        AminoAcid::new("S", 87.03203),   // Serine
+        AminoAcid::new("T", 101.04768),  // Threonine
+        AminoAcid::new("W", 186.07931),  // Tryptophan
+        AminoAcid::new("Y", 163.06333),  // Tyrosine
+        AminoAcid::new("V", 99.06841),   // Valine
+    ];
 
+    // Set the maximum mass
+    let max_mass = 1000.0;
+ 
+    // Generate possible masses
+    let masses = generate_masses(&amino_acids, max_mass);
+    
+    // Print the generated masses    
+    for mass in masses.iter() {
+        println!("{}", mass);
+    }
+
+    // Mass generator test:
     let res_seq = AminoAcidSequence::new();
     let aalist = res_seq.aa_residual_composition.keys().collect::<Vec<_>>();
     let values = res_seq.aa_residual_composition.values();
