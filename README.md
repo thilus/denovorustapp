@@ -1,7 +1,7 @@
 # De Novo Peptide Sequencing Graph Algorithm (coded in Rust)
 
 A brief overview of the algorithm:
-1) Extract peaks from mass spectra [works!].
+1) Extract peaks from mass spectra [works].
 2) Generate spectrum graphs with nodes (and additional node filtering) [works].
 3) Generate mass decompositions (up to 1000 Da) + Knapsack search [to be implemented].
 4) Draw the edges of two nodes that share corresponding masses [to be implemented].
