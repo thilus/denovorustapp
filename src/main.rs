@@ -120,7 +120,7 @@ fn main() {
     ];
 
     // Set the maximum mass
-    let max_mass = 1000.0;
+    let max_mass = 500.0;
  
     // Generate possible masses
     let masses = generate_masses(&amino_acids, max_mass);

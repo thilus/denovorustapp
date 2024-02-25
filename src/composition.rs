@@ -2,6 +2,10 @@ use std::collections::HashMap;
 use std::collections::HashSet;
 use std::hash::{Hash, Hasher};
 use std::fmt;
+use std::fs::File;
+use std::io::BufRead;
+use std::io::{self, BufReader, BufWriter, Read, Write};
+use std::path::Path;
 
 #[derive(Clone, Debug)]
 pub struct Composition {
@@ -141,8 +145,7 @@ pub fn generate_seqmz_candidates(res_seq: &AminoAcidSequence, max_mass: f64, aal
     let mut result = Vec::new();
     let aalist = res_seq.aa_residual_composition.keys().collect::<Vec<_>>();
     
-    let mut i = aalist_startindex;
-    println!("test");
+    let mut i = aalist_startindex;  
     if aalist.len() - 1 == aalist_startindex {
         loop {
             println!("calc: mass {}", res_seq.aa_residual_composition[&aalist[i]].mass());
@@ -216,30 +219,59 @@ impl AminoAcid {
 
 // Function to generate all possible masses from a set of amino acids
 pub fn generate_masses(amino_acids: &[AminoAcid], max_mass: f64) -> HashSet<Float> {
+    if let Some(masses) = load_generated_masses() {
+        return masses;
+    }
+
     let mut masses = HashSet::new();
-    generate_masses_recursive(amino_acids, &mut masses, max_mass, 0.0);
+    let mut stack = Vec::new();
+
+    // Initialize the stack with initial state
+    stack.push((0, 0.0));
+
+    while let Some((index, current_mass)) = stack.pop() {
+        if current_mass < max_mass {
+            masses.insert(Float(current_mass));
+
+            // Iterate over the remaining amino acids
+            for i in index..amino_acids.len() {
+                let new_mass = current_mass + amino_acids[i].mass.0;
+                println!("Adding Amino Acid: {}, New Mass: {:.4}", amino_acids[i].symbol, new_mass);
+                stack.push((i, new_mass));
+            }
+        }
+    }
+    dump_generated_masses(&masses);
     masses
 }
 
-// Recursive function to generate masses
-fn generate_masses_recursive(
-    amino_acids: &[AminoAcid],
-    masses: &mut HashSet<Float>,
-    max_mass: f64,
-    current_mass: f64,
-) {
-    println!("mass: {}, max_mass: {}", current_mass, max_mass);
-    if current_mass < max_mass {
-        println!("mass: {}", current_mass);
-        masses.insert(Float(current_mass));
-        for amino_acid in amino_acids {
-            let new_mass = current_mass + amino_acid.mass.0; // Unwrap the Float
-            println!("Adding Amino Acid: {}, New Mass: {:.4}", amino_acid.symbol, new_mass);
-            generate_masses_recursive(amino_acids, masses, max_mass, new_mass);
+// Function to dump generated masses into a file
+fn dump_generated_masses(masses: &HashSet<Float>) {
+    if let Ok(mut file) = File::create("generated_masses.txt") {
+        let mut writer = BufWriter::new(&mut file);
+        for mass in masses {
+            writeln!(writer, "{}", mass.0).unwrap();
         }
-    }    
+    }
 }
 
+// Function to load generated masses from a file
+fn load_generated_masses() -> Option<HashSet<Float>> {
+    let path = Path::new("generated_masses.txt");
+    if let Ok(file) = File::open(path) {
+        let reader = BufReader::new(file);
+        let mut masses = HashSet::new();
+        for line in reader.lines() {
+            if let Ok(mass_str) = line {
+                if let Ok(mass_value) = mass_str.parse::<f64>() {
+                    masses.insert(Float(mass_value));
+                }
+            }
+        }
+        return Some(masses);
+    }
+    None
+}
 
 #[cfg(test)]
 mod tests {
