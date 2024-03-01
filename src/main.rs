@@ -3,7 +3,7 @@ use spectrum::Spectrum;
 mod graph;
 mod node;
 mod composition;
-use composition::AminoAcidSequence;
+use composition::AminoAcidSet;
 use composition::AminoAcid;
 use composition::generate_masses;
 use composition::generate_seqmz_candidates;
@@ -131,23 +131,23 @@ fn main() {
     }
 
     // Mass generator test:
-    let res_seq = AminoAcidSequence::new();
-    let aalist = res_seq.aa_residual_composition.keys().collect::<Vec<_>>();
-    let values = res_seq.aa_residual_composition.values();
+    let aa_set = AminoAcidSet::new();
+    let aalist = aa_set.aa_residual_composition.keys().collect::<Vec<_>>();
+    let values = aa_set.aa_residual_composition.values();
 
     // Iterate over the vector and print out the values
     let mut index = 0;
 
     // TODO: check this why it does not work anymore?!
     for item in &aalist {
-        let mass = res_seq.aa_residual_composition[&aalist[index]].mass();
+        let mass = aa_set.aa_residual_composition[&aalist[index]].mass();
         println!("AA {:?} {}", item, mass);
         index += 1;
     }
 
     let max_mass = 1000.0;
     let aalist_startindex = 0;
-    let result = generate_seqmz_candidates(&res_seq, max_mass, aalist_startindex);
+    let result = generate_seqmz_candidates(&aa_set, max_mass, aalist_startindex);
 
     // Print the result
     println!("Result: {:?}", result);
