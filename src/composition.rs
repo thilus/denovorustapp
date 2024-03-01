@@ -220,12 +220,16 @@ impl AminoAcid {
 }
 
 // Function to generate all possible masses from a set of amino acids
-pub fn generate_masses(amino_acids: &[AminoAcid], max_mass: f64) -> HashSet<Float> {
+pub fn generate_masses(max_mass: f64) -> HashSet<Float> {
     if let Some(masses) = load_generated_masses() {
         return masses;
     }
 
-    let mut masses = HashSet::new();
+    // Initialize the amino acid set (containing the 20 essential aminco acids with their composition)
+    let aa_set = AminoAcidSet::new();
+    let aalist = aa_set.aa_residual_composition.keys().collect::<Vec<_>>();
+
+    let mut masses: HashSet<Float> = HashSet::new();
     let mut stack = Vec::new();
 
     // Initialize the stack with initial state
@@ -236,10 +240,10 @@ pub fn generate_masses(amino_acids: &[AminoAcid], max_mass: f64) -> HashSet<Floa
             masses.insert(Float(current_mass));
 
             // Iterate over the remaining amino acids
-            for i in index..amino_acids.len() {
-                let new_mass = current_mass + amino_acids[i].mass.0;
-                println!("Adding Amino Acid: {}, New Mass: {:.4}", amino_acids[i].symbol, new_mass);
-                stack.push((i, new_mass));
+            for &aa in &aalist[index..] {
+                let new_mass = current_mass + aa_set.aa_residual_composition[&aalist[index]].mass();
+                println!("Adding Amino Acid: {}, New Mass: {:.4}", aa, new_mass);
+                stack.push((index + 1, new_mass));
             }
         }
     }
