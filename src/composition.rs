@@ -241,7 +241,7 @@ pub fn generate_masses(max_mass: f64) -> HashSet<Float> {
 
             // Iterate over the remaining amino acids
             for &aa in &aalist[index..] {
-                let new_mass = current_mass + aa_set.aa_residual_composition[&aalist[index]].mass();
+                let new_mass = current_mass + aa_set.aa_residual_composition[&aa].mass();
                 println!("Adding Amino Acid: {}, New Mass: {:.4}", aa, new_mass);
                 stack.push((index + 1, new_mass));
             }

@@ -97,7 +97,7 @@ fn parse_mz_intensities(data: &str) -> Option<(Vec<f32>, Vec<f32>)> {
 fn main() {
 
     // Set the maximum mass
-    let max_mass = 500.0;
+    let max_mass = 450.0;
  
     // Generate possible masses
     let masses = generate_masses(max_mass);
