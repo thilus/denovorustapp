@@ -4,13 +4,13 @@ mod graph;
 mod node;
 mod composition;
 use composition::AminoAcidSet;
-use composition::AminoAcid;
 use composition::generate_masses;
 use composition::generate_seqmz_candidates;
 use graph::Graph;
 use std::fs::File;
-use std::io::{BufRead, BufReader};
 use std::fs;
+use std::io::BufReader;
+use std::io::BufRead;
 
 fn read_mgf_file_and_return_spectra(file_input: &str) -> Vec<Spectrum> {
     // Attempt to get the full path
@@ -97,7 +97,7 @@ fn parse_mz_intensities(data: &str) -> Option<(Vec<f32>, Vec<f32>)> {
 fn main() {
 
     // Set the maximum mass
-    let max_mass = 450.0;
+    let max_mass = 250.0;
  
     // Generate possible masses
     let masses = generate_masses(max_mass);

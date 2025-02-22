@@ -150,6 +150,9 @@ pub fn generate_seqmz_candidates(aa_set: &AminoAcidSet, max_mass: f64, aalist_st
     let mut i = aalist_startindex;  
     if aalist.len() - 1 == aalist_startindex {
         loop {
+            if i >= aalist.len() {
+                break;
+            }
             println!("calc: mass {}", aa_set.aa_residual_composition[&aalist[i]].mass());
             // TODO: multiple the chars by index i! account for this in the aminoacidseq
             let mass = if i < aalist.len() { aa_set.aa_residual_composition[&aalist[i]].mass() } else { 0.0 };
@@ -165,6 +168,9 @@ pub fn generate_seqmz_candidates(aa_set: &AminoAcidSet, max_mass: f64, aalist_st
     } else {
         i = 0;
         loop {
+            if i >= aalist.len() {
+                break;
+            }
             let mass = if i < aalist.len() { aa_set.aa_residual_composition[&aalist[aalist_startindex]].mass() } else { 0.0 };
             let mass_remain = 1000.0 - mass;
             if mass_remain < 0.0 {
@@ -232,18 +238,22 @@ pub fn generate_masses(max_mass: f64) -> HashSet<Float> {
     let mut masses: HashSet<Float> = HashSet::new();
     let mut stack = Vec::new();
 
-    // Initialize the stack with initial state
-    stack.push((0, 0.0));
+    // Initialize the stack with initial state: start index, zero mass, and empty sequence
+    stack.push((0, 0.0, String::new()));
 
-    while let Some((index, current_mass)) = stack.pop() {
+    while let Some((index, current_mass, sequence)) = stack.pop() {
         if current_mass < max_mass {
             masses.insert(Float(current_mass));
 
             // Iterate over the remaining amino acids
             for &aa in &aalist[index..] {
-                let new_mass = current_mass + aa_set.aa_residual_composition[&aa].mass();
-                println!("Adding Amino Acid: {}, New Mass: {:.4}", aa, new_mass);
-                stack.push((index + 1, new_mass));
+                let aa_mass = aa_set.aa_residual_composition[&aa].mass();
+                let new_mass = current_mass + aa_mass;
+                // Append the new amino acid to the current sequence
+                let new_sequence = format!("{}{}", sequence, aa);
+                println!("Amino Acid Sequence: {} | New Mass: {:.4}", new_sequence, new_mass);
+                // Push the new state; increment index to ensure we do not recombine the same combinations.
+                stack.push((index + 1, new_mass, new_sequence));
             }
         }
     }
