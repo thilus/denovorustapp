@@ -97,7 +97,7 @@ fn parse_mz_intensities(data: &str) -> Option<(Vec<f32>, Vec<f32>)> {
 fn main() {
 
     // Set the maximum mass
-    let max_mass = 250.0;
+    /*let max_mass = 250.0;
  
     // Generate possible masses
     let masses = generate_masses(max_mass);
@@ -127,7 +127,7 @@ fn main() {
     let result = generate_seqmz_candidates(&aa_set, max_mass, aalist_startindex);
 
     // Print the result
-    println!("Result: {:?}", result);
+    println!("Result: {:?}", result); */
 
     let infile = "test.mgf";
     let spectra = read_mgf_file_and_return_spectra(infile);

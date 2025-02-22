@@ -9,6 +9,7 @@ pub struct Node {
     pub(crate) rank: i32,
 }
 
+#[allow(dead_code)]
 impl Node {
     pub fn new(mz: f32, intensity: f32, charge: i32) -> Self {
         Self {
